@@ -1,0 +1,16 @@
+.DS_Store
+.vscode
+.github
+.git
+.gitignore
+build
+cover
+tmp
+*Dockerfile*
+*Jenkinsfile*
+config/*.env
+Makefile
+README.md
+pkg
+**/node_modules
+.env

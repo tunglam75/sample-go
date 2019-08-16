@@ -1,0 +1,44 @@
+events {
+
+}
+
+http {
+    
+    server {
+        listen 80;
+        proxy_request_buffering off;
+        resolver ${NAMESERVERS} valid=2s;
+        set $domain_upstream ${DOMAIN_UPSTREAM};
+
+        location / {
+            proxy_ignore_client_abort on;
+
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+
+            # app comes from /etc/hosts, Docker added it for us!
+            proxy_pass http://$domain_upstream:8080;
+        }
+
+        location ~ /[0-9]+.html {
+            root /etc/nginx/error;
+            allow all;
+        }
+
+        location ~ /[0-9]+.json {
+            root /etc/nginx/error;
+            allow all;
+        }
+
+        # alb health check stub page.
+        location ~ /nginx_status {
+            stub_status on;
+            access_log off;
+        }
+
+        # disable bot visit admin page
+        # location = /robots.txt {
+        #     return 200 "User-agent: *\nDisallow: /\n";
+        # }
+    }
+}

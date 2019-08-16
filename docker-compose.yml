@@ -1,0 +1,47 @@
+version: "3"
+volumes:
+  object-vol: # Volume to host s3 service data locally.
+    driver: "local"
+  data-vol: # Volume to host db service data locally.
+    driver: "local"
+services:
+  go-app:
+    build: 
+      context: ./app
+      dockerfile: build/Dockerfile
+      args:
+        IMAGE_NAME: ${GO_IMAGE}
+        ENVIRONMENT: ${ENVIRONMENT}
+        APP_NAME: ${APPLICATION}
+    env_file:
+      - config/app.env
+    # links:
+    #   - db:db
+    #   - s3:s3
+    #   - redis:redis
+    # depends_on:
+    #   - db
+    #   - s3
+    #   - redis
+    ports:
+      - "8080:8080"
+    working_dir: /go/src/${APPLICATION}/app
+    volumes:
+      - ./app:/go/src/${APPLICATION}/app
+    container_name: ${APPLICATION}-go-cont
+  proxy-app:
+    build: 
+      context: ./nginx
+      dockerfile: build/Dockerfile
+      args:
+        IMAGE_NAME: ${PROXY_IMAGE}
+    env_file:
+      - config/proxy.env
+    ports:
+      - "80:80"
+      # - "443:443"
+    links:
+      - go-app:app
+    depends_on:
+      - go-app
+    container_name: ${APPLICATION}-proxy-cont
