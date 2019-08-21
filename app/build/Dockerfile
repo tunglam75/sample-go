@@ -35,7 +35,7 @@ ENV WORK_DIR $GOPATH/src/${APP_NAME}/app
 
 COPY . ./
 
-RUN dep ensure -v -vendor-only=true && \
+RUN dep ensure -v -vendor-only=true
 # RUN dep ensure -v 
 RUN    go build 
     # rm /root/.ssh/id_rsa && \
